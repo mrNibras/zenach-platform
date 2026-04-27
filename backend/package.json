@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/utils/seedData.js",
+    "add-mohammed": "node src/utils/addSpecificAdmin.js",
     "test-db": "node test-db-connection.js",
     "smoke": "node smoke-test.js",
     "build": "echo 'Build completed'"
