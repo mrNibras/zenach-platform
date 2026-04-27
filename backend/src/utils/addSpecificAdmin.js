@@ -22,6 +22,7 @@ const addAdmin = async () => {
 
     if (existingAdmin) {
       console.log(`Admin with email ${email} already exists.`);
+      await mongoose.disconnect();
       process.exit(0);
     }
 
@@ -33,9 +34,11 @@ const addAdmin = async () => {
     });
 
     console.log('✅ Success: Admin "Mohammed Ahmed" has been added to the database.');
+    await mongoose.disconnect();
     process.exit(0);
   } catch (error) {
     console.error('❌ Error adding admin:', error.message);
+    if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
     process.exit(1);
   }
 };
