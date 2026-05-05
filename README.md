@@ -1,5 +1,9 @@
 # Zenach Platform
 
+<p align="center">
+  <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80" alt="Zenach Platform Banner" width="100%">
+</p>
+
 A modern platform built to provide a seamless user experience.
 
 ## 🚀 Live Demo
