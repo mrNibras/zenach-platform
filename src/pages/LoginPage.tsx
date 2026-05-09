@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,6 +17,25 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/';
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (token) {
+      const user = {
+        _id: params.get('id')!,
+        name: params.get('name')!,
+        email: params.get('email')!,
+        role: params.get('role')!,
+      };
+      login(user, token);
+      navigate(user.role === 'admin' ? '/admin' : from, { replace: true });
+    }
+  }, [location, login, navigate, from]);
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -134,6 +153,21 @@ export default function LoginPage() {
               <span>{isLoading ? 'Logging in...' : 'Login'}</span>
             </button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="border-t w-full border-gray-200"></div>
+              <span className="bg-white px-4 text-sm text-gray-500 absolute">Or continue with</span>
+            </div>
+
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              <img className="h-5 w-5 mr-2" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />
+              Google
+            </button>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
