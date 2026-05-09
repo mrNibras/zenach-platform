@@ -20,11 +20,11 @@ const router = express.Router();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'your_id',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your_secret',
-    callbackURL: "/api/auth/google/callback"
+    callbackURL: "http://localhost:10000/api/auth/google/callback"
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      let user = await User.findOne({ 
+      let user = await User.findOne({
         $or: [{ googleId: profile.id }, { email: profile.emails[0].value }] 
       });
 
@@ -35,7 +35,7 @@ passport.use(new GoogleStrategy({
       }
 
       user = await User.create({
-        name: profile.displayName,
+        name: profile.displayName || profile.emails[0].value.split('@')[0],
         email: profile.emails[0].value,
         googleId: profile.id,
       });
@@ -56,15 +56,20 @@ router.route('/admins/:id').put(protect, admin, updateAdmin).delete(protect, adm
 // Google Auth Routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+const frontendUrl = process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:5173';
+
+router.get('/google/callback',
+  passport.authenticate('google', { 
+    failureRedirect: `${frontendUrl}/login?error=google_auth_failed`, 
+    session: false 
+  }),
   (req, res) => {
     // Generate token
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     
-    // Redirect to frontend with data
-    const frontendUrl = process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:5173';
-    res.redirect(`${frontendUrl}/login?token=${token}&id=${req.user._id}&name=${req.user.name}&email=${req.user.email}&role=${req.user.role}`);
+    // Redirect to frontend with encoded data
+    const queryParams = `token=${token}&id=${req.user._id}&name=${encodeURIComponent(req.user.name)}&email=${encodeURIComponent(req.user.email)}&role=${req.user.role || 'user'}`;
+    res.redirect(`${frontendUrl}/login?${queryParams}`);
   }
 );
 
