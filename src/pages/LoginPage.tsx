@@ -34,7 +34,7 @@ export default function LoginPage() {
   }, [location, login, navigate, from]);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:10000/api'}/auth/google`;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

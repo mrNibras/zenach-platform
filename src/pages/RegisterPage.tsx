@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserPlus, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -18,8 +18,23 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      const user = {
+        _id: params.get('id')!,
+        name: params.get('name')!,
+        email: params.get('email')!,
+        role: params.get('role')!,
+      };
+      login(user, token);
+      navigate("/", { replace: true });
+    }
+  }, [login, navigate]);
+
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:10000/api'}/auth/google`;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
